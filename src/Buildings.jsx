@@ -47,16 +47,85 @@ const buildings = [
   { id: 10, name: "Sports Complex", location: "South Campus", description: "Outdoor courts and fields for varsity training.", image: fallbackImage, totalFacilities: 5, coordinates: "15.1195, 120.5688", createdAt: "Sep. 1, 2020", updatedAt: "Dec. 15, 2025" },
 ];
 
+const emptyEditForm = {
+  id: null,
+  name: "",
+  location: "",
+  description: "",
+  image: fallbackImage,
+};
+
 export default function Buildings({ onNavigate, activePage = "buildings" }) {
+  const [buildingList, setBuildingList] = useState(buildings);
   const [selectedId, setSelectedId] = useState(buildings[0].id);
   const [search, setSearch] = useState("");
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState(emptyEditForm);
 
-  const selected = buildings.find((b) => b.id === selectedId) ?? buildings[0];
-  const filtered = buildings.filter((b) =>
+  const selected = buildingList.find((b) => b.id === selectedId) ?? buildingList[0];
+  const filtered = buildingList.filter((b) =>
     b.name.toLowerCase().includes(search.toLowerCase())
   );
   const tableCellBase = "h-[72px] border-b border-gray-100 px-2.5 py-3 align-middle text-gray-700";
   const selectedCell = "border-y border-y-blue-600 bg-white";
+
+  const openEditModal = (building) => {
+    setEditForm({
+      id: building.id,
+      name: building.name,
+      location: building.location,
+      description: building.description,
+      image: building.image,
+    });
+    setIsEditOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditOpen(false);
+    setEditForm(emptyEditForm);
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditForm((current) => ({
+        ...current,
+        image: reader.result,
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleEditSubmit = (event) => {
+    event.preventDefault();
+
+    setBuildingList((current) =>
+      current.map((building) =>
+        building.id === editForm.id
+          ? {
+              ...building,
+              name: editForm.name.trim() || building.name,
+              location: editForm.location.trim() || building.location,
+              description: editForm.description.trim() || building.description,
+              image: editForm.image || building.image,
+              updatedAt: new Date().toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }),
+            }
+          : building
+      )
+    );
+    setSelectedId(editForm.id);
+    closeEditModal();
+  };
 
   return (
     <div className="flex min-h-screen bg-[#f3f4f8] font-sans text-gray-800">
@@ -187,7 +256,14 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
                       <span className="line-clamp-3 overflow-hidden">{b.description}</span>
                     </td>
                     <td className={`h-[72px] border-b border-gray-100 px-2.5 py-3 align-middle ${b.id === selectedId ? `${selectedCell} rounded-r-lg border-r border-r-blue-600` : ""}`}>
-                      <button type="button" className="flex items-center gap-1.5 border-none bg-transparent text-xs font-semibold text-blue-600">
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openEditModal(b);
+                        }}
+                        className="flex items-center gap-1.5 border-none bg-transparent text-xs font-semibold text-blue-600"
+                      >
                         <Pencil size={13} />
                         Edit
                       </button>
@@ -198,7 +274,7 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
             </table>
 
             <div className="mt-3.5 flex items-center justify-between text-xs text-gray-500">
-              <span>Showing 1 - {filtered.length} of {buildings.length} buildings</span>
+              <span>Showing 1 - {filtered.length} of {buildingList.length} buildings</span>
               <div className="flex items-center gap-2">
                 <button type="button" className="flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500">
                   <ChevronLeft size={14} />
@@ -218,7 +294,11 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
                 <span className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white">
                   Building
                 </span>
-                <button type="button" className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                <button
+                  type="button"
+                  onClick={() => openEditModal(selected)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-blue-700"
+                >
                   <Pencil size={13} />
                   Edit
                 </button>
@@ -295,6 +375,98 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
           </div>
         </div>
       </main>
+
+      {isEditOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4">
+          <form
+            onSubmit={handleEditSubmit}
+            className="w-full max-w-[560px] overflow-hidden rounded-xl bg-white shadow-2xl"
+          >
+            <div className="flex items-start justify-between border-b border-gray-100 p-5">
+              <div>
+                <h2 className="m-0 text-lg font-bold text-gray-900">Edit Building</h2>
+                <p className="m-0 mt-1 text-xs text-gray-500">
+                  Update the building image, name, location, and description.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeEditModal}
+                className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="grid gap-4 p-5">
+              <label className="grid gap-2 text-xs font-semibold text-gray-700">
+                Image
+                <div className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-4 max-[640px]:grid-cols-1">
+                  <img
+                    src={editForm.image}
+                    alt={editForm.name || "Building preview"}
+                    className="h-[96px] w-full rounded-lg border border-gray-200 object-cover"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-blue-600 hover:border-blue-300"
+                  />
+                </div>
+              </label>
+
+              <label className="grid gap-2 text-xs font-semibold text-gray-700">
+                Building name
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))}
+                  className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal text-gray-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  required
+                />
+              </label>
+
+              <label className="grid gap-2 text-xs font-semibold text-gray-700">
+                Location
+                <input
+                  type="text"
+                  value={editForm.location}
+                  onChange={(event) => setEditForm((current) => ({ ...current, location: event.target.value }))}
+                  className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal text-gray-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  required
+                />
+              </label>
+
+              <label className="grid gap-2 text-xs font-semibold text-gray-700">
+                Description
+                <textarea
+                  value={editForm.description}
+                  onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))}
+                  className="min-h-[110px] resize-y rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal leading-relaxed text-gray-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  required
+                />
+              </label>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50 p-4">
+              <button
+                type="button"
+                onClick={closeEditModal}
+                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

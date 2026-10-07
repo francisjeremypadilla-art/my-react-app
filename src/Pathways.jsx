@@ -179,6 +179,8 @@ export default function Pathways({ onNavigate, activePage = "pathways" }) {
                 ? "facilities"
                 : label.toLowerCase() === "pathways"
                 ? "pathways"
+                : label.toLowerCase() === "logs"
+                ? "logs"
                 : label.toLowerCase() === "system information"
                 ? "system"
                 : "dashboard";

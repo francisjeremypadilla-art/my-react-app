@@ -74,8 +74,8 @@ function FacilityCard({ facility, active, onSelect }) {
         <img src={facility.image} alt={facility.name} className="h-full w-full object-cover" />
       </div>
       <div className="flex flex-col gap-1 p-[10px_12px_12px]">
-        <div className="flex items-center gap-1.5 text-[13px] font-bold text-blue-600">
-          <BookOpen size={16} />
+        <div className="flex items-center gap-1.5 text-[13px] font-bold text-gray-900">
+          <BookOpen size={16} className="text-blue-600" />
           <span>{facility.name}</span>
         </div>
         <p className="m-0 flex items-center gap-1 text-[11px] text-gray-500">
@@ -179,8 +179,8 @@ export default function Facilities({ onNavigate, activePage = "facilities" }) {
       <main className="flex flex-1 flex-col gap-4 p-[0px_28px_40px]">
         <header className="-mx-[28px] flex items-start rounded-none bg-white p-4 px-7 shadow-sm">
           <div>
-            <h1 className="m-0 mb-1 text-lg font-bold text-blue-600">Facilities</h1>
-            <p className="m-0 text-xs text-blue-600/75">
+            <h1 className="m-0 mb-1 text-lg font-bold text-gray-900">Facilities</h1>
+            <p className="m-0 text-xs text-gray-500">
               Search, view, and manage campus facilities. Update accessibility information as needed.
             </p>
           </div>
@@ -216,7 +216,7 @@ export default function Facilities({ onNavigate, activePage = "facilities" }) {
           <div className="rounded-xl bg-white p-[16px_18px] shadow-sm">
             <div className="mb-3.5 flex items-start justify-between">
               <div>
-                <h2 className="m-0 mb-0.5 text-[15px] font-bold text-blue-600">All Facilities</h2>
+                <h2 className="m-0 mb-0.5 text-[15px] font-bold text-gray-900">All Facilities</h2>
                 <p className="m-0 text-xs text-gray-500">Showing {filtered.length} of 48 facilities</p>
               </div>
               <div className="flex items-center gap-2">
@@ -276,7 +276,7 @@ export default function Facilities({ onNavigate, activePage = "facilities" }) {
 
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h3 className="m-0 mb-1 text-[15px] font-bold text-blue-600">{selected.name}</h3>
+                <h3 className="m-0 mb-1 text-[15px] font-bold text-gray-900">{selected.name}</h3>
                 <p className="m-0 flex items-center gap-1.5 text-[11px] text-gray-500">
                   <MapPin size={12} />
                   {selected.location}
