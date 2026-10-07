@@ -55,6 +55,8 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
   const filtered = buildings.filter((b) =>
     b.name.toLowerCase().includes(search.toLowerCase())
   );
+  const tableCellBase = "h-[72px] border-b border-gray-100 px-2.5 py-3 align-middle text-gray-700";
+  const selectedCell = "border-y border-y-blue-600 bg-white";
 
   return (
     <div className="flex min-h-screen bg-[#f3f4f8] font-sans text-gray-800">
@@ -144,7 +146,7 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
               </button>
             </div>
 
-            <table className="buildings-table w-full border-separate border-spacing-0 text-[13px]">
+            <table className="w-full table-fixed border-separate border-spacing-0 text-[13px]">
               <colgroup>
                 <col className="w-[6%]" />
                 <col className="w-[31%]" />
@@ -166,27 +168,25 @@ export default function Buildings({ onNavigate, activePage = "buildings" }) {
                   <tr
                     key={b.id}
                     onClick={() => setSelectedId(b.id)}
-                    className={`cursor-pointer transition-colors hover:bg-slate-50 ${
-                      b.id === selectedId ? "building-row-selected" : ""
-                    }`}
+                    className="h-[72px] cursor-pointer transition-colors hover:bg-slate-50"
                   >
-                    <td className="border-b border-gray-100 px-2.5 py-3 align-middle text-gray-700">{index + 1}</td>
-                    <td className="border-b border-gray-100 px-2.5 py-3 align-middle text-gray-700">
+                    <td className={`${tableCellBase} ${b.id === selectedId ? `${selectedCell} rounded-l-lg border-l border-l-blue-600` : ""}`}>{index + 1}</td>
+                    <td className={`${tableCellBase} ${b.id === selectedId ? selectedCell : ""}`}>
                       <div className="flex items-center gap-2.5 font-medium">
                         <span className="h-[30px] w-[30px] flex-shrink-0 rounded-md bg-gray-200" />
-                        <span className="building-name-copy">{b.name}</span>
+                        <span className="line-clamp-2 overflow-hidden">{b.name}</span>
                       </div>
                     </td>
-                    <td className="border-b border-gray-100 px-2.5 py-3 align-middle text-gray-700">
+                    <td className={`${tableCellBase} ${b.id === selectedId ? selectedCell : ""}`}>
                       <span className="flex items-center gap-1 text-xs text-gray-500">
                         <MapPin size={12} />
-                        <span className="building-location-copy">{b.location}</span>
+                        <span className="line-clamp-2 overflow-hidden">{b.location}</span>
                       </span>
                     </td>
-                    <td className="max-w-[240px] border-b border-gray-100 px-2.5 py-3 align-middle text-xs text-gray-500">
-                      <span className="building-description-copy">{b.description}</span>
+                    <td className={`max-w-[240px] ${tableCellBase} text-xs text-gray-500 ${b.id === selectedId ? selectedCell : ""}`}>
+                      <span className="line-clamp-3 overflow-hidden">{b.description}</span>
                     </td>
-                    <td className="border-b border-gray-100 px-2.5 py-3 align-middle">
+                    <td className={`h-[72px] border-b border-gray-100 px-2.5 py-3 align-middle ${b.id === selectedId ? `${selectedCell} rounded-r-lg border-r border-r-blue-600` : ""}`}>
                       <button type="button" className="flex items-center gap-1.5 border-none bg-transparent text-xs font-semibold text-blue-600">
                         <Pencil size={13} />
                         Edit
